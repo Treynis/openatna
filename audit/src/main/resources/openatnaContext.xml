@@ -105,11 +105,15 @@
     <!-- ============================ Persistence Configuration ======================== -->
     <!-- =============================================================================== -->
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="${db.driver.class}"/>
-        <property name="url" value="${db.url}"/>
-        <property name="username" value="${db.username}"/>
-        <property name="password" value="${db.password}"/>
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db.driver.class}" />
+        <property name="url" value="${db.url}" />
+        <property name="username" value="${db.username}" />
+        <property name="password" value="${db.password}" />
+        <property name="initialSize" value="${cp.initial.size}" />
+        <property name="maxActive" value="${cp.max.active}" />
+        <property name="maxWait" value="${cp.max.wait}" />
+        <property name="validationQuery" value="${cp.validation.query}" />
     </bean>
 
     <!-- Hibernate SessionFactory
