@@ -32,6 +32,7 @@ import org.openhealthtools.openatna.audit.persistence.dao.ErrorDao;
 import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
 import org.openhealthtools.openatna.audit.service.AuditService;
 import org.openhealthtools.openatna.audit.service.ServiceConfiguration;
+import org.openhealthtools.openatna.audit.util.AuditLogBackupWriter;
 import org.openhealthtools.openatna.syslog.LogMessage;
 import org.openhealthtools.openatna.syslog.SyslogException;
 import org.openhealthtools.openatna.syslog.SyslogMessage;
@@ -70,14 +71,19 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage> {
         	log.error(e1);
         }
         atnaMessage.setMessageContent(bytes);
+        boolean persisted = false;
         try {
-            service.process(atnaMessage);
+             persisted = service.process(atnaMessage);
         } catch (Exception e) {            
             SyslogException ex = new SyslogException(e.getMessage(), e, bytes);
             if (message.getSourceIp() != null) {
                 ex.setSourceIp(message.getSourceIp());
             }
             exceptionThrown(ex);
+        } finally {
+        	if(!persisted) {
+        		AuditLogBackupWriter.writeAuditMessageToFile(message.toString(), Integer.toString(message.getFacility()), Integer.toString(message.getSeverity()));
+        	}
         }
     }
 

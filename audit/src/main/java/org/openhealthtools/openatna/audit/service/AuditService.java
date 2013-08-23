@@ -24,7 +24,6 @@ import java.io.IOException;
 
 import org.openhealthtools.openatna.anom.AtnaMessage;
 import org.openhealthtools.openatna.audit.server.ServerConfiguration;
-import org.openhealthtools.openatna.syslog.SyslogMessage;
 
 /**
  * @author Andrew Harrison
@@ -70,7 +69,7 @@ public interface AuditService {
      *
      * @return
      */
-    public void process(AtnaMessage message) throws Exception;
+    public boolean process(AtnaMessage message) throws Exception;
 
     /**
      * get the ServiceConfig
