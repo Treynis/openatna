@@ -49,17 +49,17 @@ public class UdpServer implements Server {
     private IUdpServerConnection udpConn = null;
     private boolean running = false;
     private UdpServerThread thread;
-
+    private DatagramSocket socket = null;
+    
     public UdpServer(AtnaServer atnaServer, IConnectionDescription udpConnection) {
         this.atnaServer = atnaServer;
         this.udpConnection = udpConnection;
     }
 
     public void start() {
-        System.out.println("UdpServer.start ENTER");
         try {
             udpConn = ConnectionFactory.getUdpServerConnection(udpConnection);
-            DatagramSocket socket = udpConn.getServerSocket();
+            socket = udpConn.getServerSocket();
             thread = new UdpServerThread(socket);
             running = true;
             thread.start();
@@ -72,6 +72,7 @@ public class UdpServer implements Server {
 
     public void stop() {
         running = false;
+        socket.close();
         thread.interrupt();
         udpConn.closeServerConnection();
         log.info("UDP Server shutting down...");
