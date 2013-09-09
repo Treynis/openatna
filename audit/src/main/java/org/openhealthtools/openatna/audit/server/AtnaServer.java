@@ -30,8 +30,7 @@ import org.openhealthtools.openatna.syslog.SyslogMessage;
 import org.openhealthtools.openatna.syslog.transport.SyslogListener;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -50,18 +49,13 @@ public class AtnaServer {
     private boolean nio = false;
     private MessageQueue queue = null;
 
-    private volatile boolean destroyed = false;
-
-    private Executor exec;
-
+    private ExecutorService exec;
 
     public AtnaServer(IConnectionDescription tlsConnection, IConnectionDescription udpConnection, int threads, boolean nio) {
         this.tlsConnection = tlsConnection;
         this.udpConnection = udpConnection;
         this.nio = nio;
         exec = Executors.newFixedThreadPool(threads);
-        new ShutdownHook().createHook();
-
     }
 
     public AtnaServer(IConnectionDescription tlsConnection, IConnectionDescription udpConnection) {
@@ -90,7 +84,8 @@ public class AtnaServer {
     }
 
     public void stop() throws IOException {
-        if (tcpServer != null) {
+        log.info("AtnaServer shutting down...");
+    	if (tcpServer != null) {
             tcpServer.stop();
         }
         if (udpServer != null) {
@@ -99,6 +94,8 @@ public class AtnaServer {
         if (queue != null) {
             queue.stop();
         }
+        
+        exec.shutdown();
     }
 
     public void execute(Runnable r) {
@@ -124,49 +121,4 @@ public class AtnaServer {
             queue.put(ex);
         }
     }
-
-    private void kill() {
-        try {
-            stop();
-        } catch (IOException e) {
-            log.debug(e);
-        }
-    }
-
-    private class ShutdownHook extends Thread {
-
-        private void add() {
-            try {
-                Method shutdownHook = java.lang.Runtime.class.getMethod("addShutdownHook",
-                        new Class[]{java.lang.Thread.class});
-                shutdownHook.invoke(Runtime.getRuntime(), new Object[]{this});
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void createHook() {
-            add();
-        }
-
-        public void run() {
-            log.info("AtnaServer$ShutdownHook.run ENTER");
-            if (!destroyed) {
-                try {
-                    kill();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    log.debug(e);
-                    //e.printStackTrace();
-                }
-                destroyed = true;
-            }
-            log.info("AtnaServer$ShutdownHook.run EXIT");
-        }
-    }
-
 }

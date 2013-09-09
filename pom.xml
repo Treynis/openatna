@@ -163,9 +163,9 @@
         <module>jaxb</module>
         <module>net</module>
         <module>report</module>
-        <module>web</module>
         <module>archive</module>
         <module>all</module>
+        <module>web</module>
     </modules>
     <!-- Properties defined by OpenATNA -->
     <properties>

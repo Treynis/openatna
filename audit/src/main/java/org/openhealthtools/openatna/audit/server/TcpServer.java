@@ -47,12 +47,12 @@ public class TcpServer implements Server {
 
     private static Log log = LogFactory.getLog("org.openhealthtools.openatna.audit.server.TcpServer");
 
-
     private AtnaServer atnaServer;
     private IConnectionDescription tlsConnection;
     private IServerConnection tlsConn = null;
     private boolean running = false;
     private TcpServerThread thread;
+    private ServerSocket ss = null;
 
     public TcpServer(AtnaServer atnaServer, IConnectionDescription tlsConnection) {
         this.atnaServer = atnaServer;
@@ -61,7 +61,7 @@ public class TcpServer implements Server {
 
     public void start() {
         tlsConn = ConnectionFactory.getServerConnection(tlsConnection);
-        ServerSocket ss = tlsConn.getServerSocket();
+        ss = tlsConn.getServerSocket();
         running = true;
         thread = new TcpServerThread(ss);
         thread.start();
@@ -70,6 +70,11 @@ public class TcpServer implements Server {
 
     public void stop() {
         running = false;
+        try {
+			ss.close();
+		} catch (IOException e) {
+			log.warn("Unable to close Tcp server socket.", e);
+		}
         thread.interrupt();
         tlsConn.closeServerConnection();
         log.info("TLS Server shutting down...");

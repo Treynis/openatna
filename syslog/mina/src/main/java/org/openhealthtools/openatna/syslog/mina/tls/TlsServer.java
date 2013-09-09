@@ -37,7 +37,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
@@ -57,7 +57,7 @@ public class TlsServer implements Notifier {
 
     private TlsConfig tlsconfig;
     private IoAcceptor acceptor;
-    private Executor exec = Executors.newFixedThreadPool(5);
+    private ExecutorService exec = Executors.newFixedThreadPool(5);
 
     private Set<SyslogListener> listeners = new HashSet<SyslogListener>();
 
@@ -100,6 +100,8 @@ public class TlsServer implements Notifier {
         if (acceptor != null) {
             acceptor.unbindAll();
         }
+        
+        exec.shutdown();
     }
 
     public void addSyslogListener(SyslogListener listener) {
