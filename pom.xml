@@ -18,7 +18,7 @@
 	and publish the new artifacts on the EU JoinUP
 	repository (https://joinup.ec.europa.eu/nexus/content/repositories/releases/eu/europa/ec/joinup/ecc/);
     -->
-    <groupId>eu.europa.ec.joinup.ecc</groupId>
+    <groupId>eu.europa.ec.joinup.ecc.epsos-openatna</groupId>
     <artifactId>epsos-openatna</artifactId>
     <packaging>pom</packaging>
     <version>2.0.0-SNAPSHOT</version>
