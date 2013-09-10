@@ -8,8 +8,18 @@
         <version>3</version>
     </parent>
 
-    <groupId>org.openhealthtools.openatna</groupId>
-    <artifactId>openatna</artifactId>
+    <!-- 
+	The project OpenATNA has been initially developed by OpenHeathTools.
+	Since the OpenNCP project have needed to make some 
+	changes to the project, the OpenNCP Community
+	have decided to change the groupId from 
+	org.openhealthtools.openatna to eu.europa.ec.joinup.ecc
+	and the artifactId from openatna to epsos-openatna
+	and publish the new artifacts on the EU JoinUP
+	repository (https://joinup.ec.europa.eu/nexus/content/repositories/releases/eu/europa/ec/joinup/ecc/);
+    -->
+    <groupId>eu.europa.ec.joinup.ecc</groupId>
+    <artifactId>epsos-openatna</artifactId>
     <packaging>pom</packaging>
     <version>2.0.0-SNAPSHOT</version>
     <name>OpenATNA</name>
@@ -156,6 +166,17 @@
             <url>scp://lapis.cs.cf.ac.uk/nfs/mntI3/static/triana/html/maven</url>
         </repository>
     </distributionManagement>  -->
+    <!-- Added EU JoinUP distribution repository -->
+    <distributionManagement>
+        <repository>
+            <id>joinup-releases</id>
+            <url>https://joinup.ec.europa.eu/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>joinup-snapshots</id>
+            <url>https://joinup.ec.europa.eu/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
     <modules>
         <module>syslog</module>
         <module>audit</module>
