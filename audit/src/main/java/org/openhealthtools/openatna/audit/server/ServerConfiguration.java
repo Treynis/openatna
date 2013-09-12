@@ -295,6 +295,4 @@ public class ServerConfiguration {
         factory.setValidating(false);
         return factory.newDocumentBuilder().parse(configFile);
     }
-
-
 }

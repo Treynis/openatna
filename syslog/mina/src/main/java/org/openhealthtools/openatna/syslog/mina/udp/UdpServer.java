@@ -36,7 +36,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
@@ -53,7 +53,7 @@ public class UdpServer implements Notifier {
 
     static Logger log = Logger.getLogger("org.openhealthtools.openatna.syslog.mina.udp.UdpServer");
 
-    private Executor exec = Executors.newFixedThreadPool(5);
+    private ExecutorService exec = Executors.newFixedThreadPool(5);
     private UdpConfig udpconfig;
     private Set<SyslogListener> listeners = new HashSet<SyslogListener>();
     private DatagramAcceptor acceptor;
@@ -86,6 +86,8 @@ public class UdpServer implements Notifier {
         if (acceptor != null) {
             acceptor.unbindAll();
         }
+        
+        exec.shutdown();
     }
 
 

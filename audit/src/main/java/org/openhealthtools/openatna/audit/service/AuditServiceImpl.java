@@ -35,6 +35,7 @@ import org.openhealthtools.openatna.audit.persistence.util.EntityConverter;
 import org.openhealthtools.openatna.audit.process.AtnaMessageListener;
 import org.openhealthtools.openatna.audit.process.AtnaProcessor;
 import org.openhealthtools.openatna.audit.process.ProcessContext;
+import org.openhealthtools.openatna.audit.process.ProcessContext.State;
 import org.openhealthtools.openatna.audit.process.ProcessorChain;
 import org.openhealthtools.openatna.audit.server.AtnaServer;
 import org.openhealthtools.openatna.audit.server.ServerConfiguration;
@@ -149,10 +150,13 @@ public class AuditServiceImpl implements AuditService {
         this.serverConfig = serverConfig;
     }
 
-
-    public void process(AtnaMessage message) throws Exception {
-        ProcessContext context = new ProcessContext(message);
+    /**
+     * Return true if persisted
+     */
+    public boolean process(AtnaMessage message) throws Exception {
+		ProcessContext context = new ProcessContext(message);
         chain.process(context);
+        return context.getState() == State.PERSISTED;
     }
 
     public ServiceConfiguration getServiceConfig() {

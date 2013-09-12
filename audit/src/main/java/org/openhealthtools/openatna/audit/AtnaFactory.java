@@ -31,8 +31,7 @@ import org.openhealthtools.openatna.audit.persistence.dao.ProvisionalDao;
 import org.openhealthtools.openatna.audit.persistence.dao.QueryDao;
 import org.openhealthtools.openatna.audit.persistence.dao.SourceDao;
 import org.openhealthtools.openatna.audit.service.AuditService;
-import org.openhealthtools.openexchange.config.ConfigurationException;
-import org.openhealthtools.openexchange.config.SpringFacade;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -68,10 +67,8 @@ public class AtnaFactory {
     public static synchronized void initialize(ApplicationContext context) {
         if (context == null) {
     		try {
-    			SpringFacade.loadSpringConfig( new String[]{"classpath*:/*Context.xml"} );
-    			context = SpringFacade.getApplicationContext();
-    		}catch(ConfigurationException e){
-    			e.printStackTrace();
+    			context = new ClassPathXmlApplicationContext(new String[]{"classpath*:/*Context.xml"});
+    		} catch(BeansException e) {
                 throw new RuntimeException("FATAL: Could not create Spring Application Context.", e);
     		}
         }

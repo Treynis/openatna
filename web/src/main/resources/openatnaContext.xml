@@ -19,15 +19,16 @@
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.springframework.org/schema/tx
-       http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
-       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd"
+       http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd"
        default-lazy-init="true">
 
     <bean id="propertyConfigurer" class="org.openhealthtools.openatna.audit.OpenAtnaPropertiesLoader">
         <property name="location">
-            <value>classpath:openatna.properties</value>
+            <value>${openATNA.properties.path}</value>
+<!--             <value>classpath:openatna.properties</value>  -->
         </property>
     </bean>
 
@@ -55,7 +56,7 @@
         *******************************************************************
 
         -->
-        <property name="logMessageClass" value="@log.message.class@"/>
+        <property name="logMessageClass" value="org.openhealthtools.openatna.all.JaxbLogMessage"/>
 
         <!--<property name="validationProcessor" value="false"/>-->
         <!--
@@ -182,4 +183,6 @@
     <bean id="queryDao" class="org.openhealthtools.openatna.audit.persistence.dao.hibernate.HibernateQueryDao">
         <constructor-arg ref="sessionFactory"/>
     </bean>
+    <bean id="OpenATNAServiceLoaderListener" class="org.openhealthtools.openatna.web.OpenATNAServiceLoaderListener" 
+    	init-method="start" destroy-method="destroy" lazy-init="false" scope="singleton" />
 </beans>

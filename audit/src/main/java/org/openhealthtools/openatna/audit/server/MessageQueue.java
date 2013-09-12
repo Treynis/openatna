@@ -22,6 +22,7 @@ package org.openhealthtools.openatna.audit.server;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openhealthtools.openatna.audit.log.SyslogErrorLogger;
 import org.openhealthtools.openatna.syslog.SyslogException;
 import org.openhealthtools.openatna.syslog.SyslogMessage;
 import org.openhealthtools.openatna.syslog.transport.SyslogListener;
@@ -36,9 +37,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @version 1.0.0 Sep 29, 2010
  */
 public class MessageQueue {
-
     private static Log log = LogFactory.getLog("org.openhealthtools.openatna.audit.server.MessageQueue");
-
 
     private ExecutorService exec = Executors.newSingleThreadExecutor();
     private boolean running = false;
@@ -54,7 +53,6 @@ public class MessageQueue {
         }
         running = true;
         exec.execute(runner);
-
     }
 
     public void stop() {
@@ -70,7 +68,6 @@ public class MessageQueue {
     public void put(SyslogException msg) {
         runner.put(msg);
     }
-
 
     private class Runner implements Runnable {
 
@@ -90,21 +87,56 @@ public class MessageQueue {
             }
         }
 
-
         public void run() {
-            while (!Thread.interrupted()) {
-                try {
-                    Object o = messageQueue.take();
-                    if (o instanceof SyslogMessage) {
-                        listener.messageArrived((SyslogMessage) o);
-                    } else if (o instanceof SyslogException) {
-                        listener.exceptionThrown((SyslogException) o);
-                    }
-                } catch (InterruptedException e) {
-                    messageQueue.clear();
-                    Thread.currentThread().interrupt();
-                }
+            while (!Thread.interrupted() && running) {
+            	Object o = messageQueue.poll();
+            	if(o == null) {
+            		try {
+						Thread.sleep(25);
+					} catch (InterruptedException e) {
+						// Ignored
+					}
+            	} else {
+            		handleMessage(o);
+            	}
             }
+
+            logAndClearMessageQueue();
+        }
+
+        private void logAndClearMessageQueue() {
+            while(messageQueue.size() > 0) {
+            	handleMessage(messageQueue.poll());
+            }
+        }
+        
+        private void handleMessage(Object o) {
+            if (o instanceof SyslogMessage) {
+                handleSysLogMessage((SyslogMessage) o);
+            } else if (o instanceof SyslogException) {
+                handleSysLogException((SyslogException) o);
+            }
+        }
+        
+        private void handleSysLogMessage(SyslogMessage message) {
+        	if(running) {
+        		listener.messageArrived(message);
+        	} else {
+            	try {
+					log.fatal("MessageQueue was unable to persist message: " + 
+							new String(message.toByteArray()));
+				} catch (SyslogException e) {
+					handleSysLogException(e);
+				}
+        	}
+        }
+        
+        private void handleSysLogException(SyslogException exception) {
+        	if(running) {
+        		listener.exceptionThrown(exception);
+        	} else {
+            	SyslogErrorLogger.log(exception);
+        	}
         }
     }
 }
