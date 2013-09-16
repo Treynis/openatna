@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openhealthtools.openatna.audit.AtnaFactory;
 import org.openhealthtools.openatna.audit.service.AuditService;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -15,16 +16,18 @@ public class OpenATNAServiceLoaderListener implements ApplicationContextAware {
 	private ApplicationContext context;
 
 	public void start() {
-			if(service == null) {
-				log.info("ContextRefreshedEvent - Starting OpenATNA service..");
-				
-		        service = (AuditService) context.getBean("auditService");
-		        try {
-		            service.start();
-		        } catch (Exception e) {
-		            log.fatal("Unable to start AuditService", e);
-		        }
-			}
+		if(service == null) {
+			log.info("Starting OpenATNA service..");
+			
+			AtnaFactory.initialize(context);
+			
+	        service = (AuditService) context.getBean("auditService");
+	        try {
+	            service.start();
+	        } catch (Exception e) {
+	            log.fatal("Unable to start AuditService", e);
+	        }
+		}
 	}
 
 	public void destroy() {
