@@ -28,7 +28,6 @@
     <bean id="propertyConfigurer" class="org.openhealthtools.openatna.audit.OpenAtnaPropertiesLoader">
         <property name="location">
             <value>${openATNA.properties.path}</value>
-<!--             <value>classpath:openatna.properties</value>  -->
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true" />
     </bean>
@@ -187,7 +186,4 @@
     	lazy-init="false" scope="singleton">
     	<property name="loggers" value="${openATNA.auditLoggers}"/>
     </bean>
-
-    <bean id="OpenATNAServiceLoaderListener" class="org.openhealthtools.openatna.web.OpenATNAServiceLoaderListener" 
-    	init-method="start" destroy-method="destroy" lazy-init="false" scope="singleton" />
 </beans>
