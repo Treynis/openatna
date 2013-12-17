@@ -237,4 +237,15 @@ public class QueryBean {
         return other;
     }
 
+	@Override
+	public String toString() {
+		return "QueryBean [sourceId=" + sourceId + ", objectId=" + objectId + ", participantId=" + participantId
+				+ ", eventOutcome=" + eventOutcome + ", eventIdCode=" + eventIdCode + ", eventTypeCode="
+				+ eventTypeCode + ", eventAction=" + eventAction + ", eventTime=" + eventTime + ", startDate="
+				+ startDate + ", startHour=" + startHour + ", startMin=" + startMin + ", participantTypeCode="
+				+ participantTypeCode + ", sourceTypeCode=" + sourceTypeCode + ", objectTypeCode=" + objectTypeCode
+				+ ", endDate=" + endDate + ", endHour=" + endHour + ", endMin=" + endMin + ", sourceAddress="
+				+ sourceAddress + ", maxResults=" + maxResults + ", startOffset=" + startOffset + "]";
+	}
+
 }

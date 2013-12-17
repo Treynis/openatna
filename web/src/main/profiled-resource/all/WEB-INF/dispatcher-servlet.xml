@@ -4,11 +4,13 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:prefix="/WEB-INF/jsp/" p:suffix=".jsp"/>
-
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:prefix="/WEB-INF/jsp/" p:suffix=".jsp">
+		<property name="exposeContextBeansAsAttributes" value="true"/>
+    </bean>
 
     <bean name="/query.html" class="org.openhealthtools.openatna.web.MessageController">
         <property name="messageDao" ref="messageDao"/>
+        <property name="auditLoggerPluginManager" ref="auditLoggerPluginManager"/>
     </bean>
 
     <bean name="/errors.html" class="org.openhealthtools.openatna.web.ErrorController">

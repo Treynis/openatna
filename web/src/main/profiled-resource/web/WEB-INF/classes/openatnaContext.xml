@@ -28,10 +28,9 @@
     <bean id="propertyConfigurer" class="org.openhealthtools.openatna.audit.OpenAtnaPropertiesLoader">
         <property name="location">
             <value>${openATNA.properties.path}</value>
-<!--             <value>classpath:openatna.properties</value>  -->
         </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
     </bean>
-
 
     <!-- =============================================================================== -->
     <!-- ========================== Audit Service Configuration ======================== -->
@@ -172,8 +171,7 @@
         <constructor-arg ref="sessionFactory"/>
     </bean>
 
-    <bean id="provisionalDao"
-          class="org.openhealthtools.openatna.audit.persistence.dao.hibernate.HibernateProvisionalDao">
+    <bean id="provisionalDao" class="org.openhealthtools.openatna.audit.persistence.dao.hibernate.HibernateProvisionalDao">
         <constructor-arg ref="sessionFactory"/>
     </bean>
 
@@ -183,6 +181,9 @@
     <bean id="queryDao" class="org.openhealthtools.openatna.audit.persistence.dao.hibernate.HibernateQueryDao">
         <constructor-arg ref="sessionFactory"/>
     </bean>
-    <bean id="OpenATNAServiceLoaderListener" class="org.openhealthtools.openatna.web.OpenATNAServiceLoaderListener" 
-    	init-method="start" destroy-method="destroy" lazy-init="false" scope="singleton" />
+
+    <bean id="auditLoggerPluginManager" class="org.openhealthtools.openatna.all.logging.AuditLoggerPluginManagerImpl" init-method="start" destroy-method="destroy" 
+    	lazy-init="false" scope="singleton">
+    	<property name="loggers" value="${openATNA.auditLoggers}"/>
+    </bean>
 </beans>

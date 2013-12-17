@@ -40,13 +40,17 @@ public class AuditLogBackupWriter {
 			out.write(am);
 		} finally {
 			try {
-				out.close();
+				if(out != null) {
+					out.close();
+				}
 			} catch(IOException e) {
 				LOG.warn("Unable to close BufferedWriter.");
 			}
 			
 			try {
-				fstream.close();
+				if(fstream != null) {
+					fstream.close();
+				}
 			} catch(IOException e) {
 				LOG.warn("Unable to close FileWriter.");
 			}
