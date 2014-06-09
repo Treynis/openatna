@@ -20,6 +20,11 @@
 
 package org.openhealthtools.openatna.audit.service;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openhealthtools.openatna.anom.AtnaCode;
@@ -41,10 +46,9 @@ import org.openhealthtools.openatna.audit.server.AtnaServer;
 import org.openhealthtools.openatna.audit.server.ServerConfiguration;
 import org.openhealthtools.openatna.syslog.SyslogMessageFactory;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
+import eu.epsos.util.audit.AuditLogSerializer.Type;
+import eu.epsos.util.audit.FailedLogsHandlerService;
+import eu.epsos.util.audit.FailedLogsHandlerServiceImpl;
 
 /**
  * This pulls together various configurations to create an ATNA Audit service
@@ -59,11 +63,14 @@ public class AuditServiceImpl implements AuditService {
 
     private static Log log = LogFactory.getLog("org.openhealthtools.openatna.audit.service.AuditServiceImpl");
 
+    public static final String KEY_TIME_BETWEEN_FAILED_LOGS_HANDLING = "time.between.failed.logs.handling";
+    public static final long DEFAULT_TIME_BETWEEN = 1 * 60 * 60 * 1000; // 1h
+    
     private ServerConfiguration serverConfig;
     private ServiceConfiguration serviceConfig = new ServiceConfiguration();
     private ProcessorChain chain = new ProcessorChain();
     private AtnaServer syslogServer;
-
+    private FailedLogsHandlerService failedLogsHandlerService = null;
 
     /**
      * start the service
@@ -101,7 +108,9 @@ public class AuditServiceImpl implements AuditService {
                 this.syslogServer = servers.get(0);
                 if (syslogServer != null) {
                     SyslogMessageFactory.setDefaultLogMessage(serviceConfig.getLogMessageClass());
-                    syslogServer.start(new AtnaMessageListener(this));
+                    AtnaMessageListener atnaMessageListener = new AtnaMessageListener(this);
+                    syslogServer.start(atnaMessageListener);
+                    failedLogsHandlerService = new FailedLogsHandlerServiceImpl(atnaMessageListener, Type.ATNA);
                 }
             }
         }
@@ -139,6 +148,10 @@ public class AuditServiceImpl implements AuditService {
     public void stop() throws IOException {
         if (syslogServer != null) {
             syslogServer.stop();
+        }
+        
+        if(failedLogsHandlerService != null) {
+        	failedLogsHandlerService.stop();
         }
     }
 

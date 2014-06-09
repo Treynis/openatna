@@ -32,14 +32,19 @@ import org.openhealthtools.openatna.audit.persistence.dao.ErrorDao;
 import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
 import org.openhealthtools.openatna.audit.service.AuditService;
 import org.openhealthtools.openatna.audit.service.ServiceConfiguration;
-import org.openhealthtools.openatna.audit.util.AuditLogBackupWriter;
 import org.openhealthtools.openatna.syslog.LogMessage;
 import org.openhealthtools.openatna.syslog.SyslogException;
 import org.openhealthtools.openatna.syslog.SyslogMessage;
 import org.openhealthtools.openatna.syslog.transport.SyslogListener;
 
+import eu.epsos.util.audit.AuditLogSerializer;
+import eu.epsos.util.audit.AuditLogSerializerImpl;
+import eu.epsos.util.audit.MessageHandlerListener;
+import eu.epsos.util.audit.AuditLogSerializer.Type;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -49,44 +54,64 @@ import java.util.Date;
  * @date $Date:$ modified by $Author:$
  */
 
-public class AtnaMessageListener implements SyslogListener<AtnaMessage> {
-	
+public class AtnaMessageListener implements SyslogListener<AtnaMessage>, MessageHandlerListener {
 	private static Log log = LogFactory.getLog("org.openhealthtools.openatna.audit.process.AtnaMessageListener");
     private AuditService service;
+    private AuditLogSerializer auditLogSerializer;
 
     public AtnaMessageListener(AuditService service) {
         this.service = service;
+        auditLogSerializer = new AuditLogSerializerImpl(Type.ATNA);
     }
 
     public void messageArrived(SyslogMessage<AtnaMessage> message) {
-        LogMessage<AtnaMessage> msg = message.getMessage();
-        AtnaMessage atnaMessage = msg.getMessageObject();
-        log.debug(atnaMessage.getEventOutcome());
-        atnaMessage.setSourceAddress(message.getSourceIp());
-        byte[] bytes = "no message available".getBytes();
-        log.info("MESSAGE ARRIVED");
+    	boolean persisted = false;
         try {
-            bytes = message.toByteArray();
-        } catch (SyslogException e1) {
-        	log.error(e1);
-        }
-        atnaMessage.setMessageContent(bytes);
-        boolean persisted = false;
-        try {
-             persisted = service.process(atnaMessage);
-        } catch (Exception e) {            
-            SyslogException ex = new SyslogException(e.getMessage(), e, bytes);
-            if (message.getSourceIp() != null) {
-                ex.setSourceIp(message.getSourceIp());
-            }
-            exceptionThrown(ex);
+             persisted = processMessage(message);
         } finally {
         	if(!persisted) {
-        		AuditLogBackupWriter.writeAuditMessageToFile(message.toString(), Integer.toString(message.getFacility()), Integer.toString(message.getSeverity()));
+        		auditLogSerializer.writeObjectToFile(message);
         	}
         }
     }
 
+	public boolean handleMessage(Serializable message) {
+		if(message != null && message instanceof SyslogMessage<?>) {
+			return processMessage((SyslogMessage<AtnaMessage>)message);
+		} else {
+			log.warn("Message null or unknown type! Cannot handle message.");
+			return false;
+		}
+	}
+
+    public boolean processMessage(SyslogMessage<AtnaMessage> message) {
+    	synchronized (this) {
+	        LogMessage<AtnaMessage> msg = message.getMessage();
+	        AtnaMessage atnaMessage = msg.getMessageObject();
+	        log.debug("Processing message " + atnaMessage.getEventOutcome());
+	        atnaMessage.setSourceAddress(message.getSourceIp());
+	        byte[] bytes = "no message available".getBytes();
+	        log.info("MESSAGE ARRIVED");
+	        try {
+	            bytes = message.toByteArray();
+	        } catch (SyslogException e1) {
+	        	log.error(e1);
+	        }
+	        atnaMessage.setMessageContent(bytes);
+	        boolean persisted = false;
+	        try {
+	        	persisted = service.process(atnaMessage);
+	        } catch (Exception e) {            
+	            SyslogException ex = new SyslogException(e.getMessage(), e, bytes);
+	            if (message.getSourceIp() != null) {
+	                ex.setSourceIp(message.getSourceIp());
+	            }
+	            exceptionThrown(ex);
+	        }
+	        return persisted;
+    	}
+    }
+    
     public void exceptionThrown(SyslogException exception) {
     	log.info("Entered in 'exceptionThrown'");
         SyslogErrorLogger.log(exception);
