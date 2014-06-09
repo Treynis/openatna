@@ -21,7 +21,7 @@
     <groupId>eu.europa.ec.joinup.ecc.epsos-openatna</groupId>
     <artifactId>epsos-openatna</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.0.2</version>
     <name>OpenATNA</name>
     <url>https://openatna.projects.openhealthtools.org</url>
     <prerequisites>
