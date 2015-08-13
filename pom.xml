@@ -9,19 +9,19 @@
     </parent>
 
     <!-- 
-	The project OpenATNA has been initially developed by OpenHeathTools.
-	Since the OpenNCP project have needed to make some 
-	changes to the project, the OpenNCP Community
-	have decided to change the groupId from 
-	org.openhealthtools.openatna to eu.europa.ec.joinup.ecc.epsos-openatna
-	and the artifactId from openatna to epsos-openatna
-	and publish the new artifacts on the EU JoinUP
-	repository (https://joinup.ec.europa.eu/nexus/content/repositories/releases/eu/europa/ec/joinup/ecc/);
+        The project OpenATNA has been initially developed by OpenHeathTools.
+        Since the OpenNCP project have needed to make some 
+        changes to the project, the OpenNCP Community
+        have decided to change the groupId from 
+        org.openhealthtools.openatna to eu.europa.ec.joinup.ecc.epsos-openatna
+        and the artifactId from openatna to epsos-openatna
+        and publish the new artifacts on the EU JoinUP
+        repository (https://joinup.ec.europa.eu/nexus/content/repositories/releases/eu/europa/ec/joinup/ecc/);
     -->
     <groupId>eu.europa.ec.joinup.ecc.epsos-openatna</groupId>
     <artifactId>epsos-openatna</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
     <name>OpenATNA</name>
     <url>https://openatna.projects.openhealthtools.org</url>
     <prerequisites>
@@ -127,25 +127,46 @@
             <id>sonatype-staging</id>
             <url>https://oss.sonatype.org/content/groups/staging</url>
         </repository>
+        <repository>
+            <id>joinup-releases</id>
+            <url>https://joinup.ec.europa.eu/nexus/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>joinup-snapshots</id>
+            <url>https://joinup.ec.europa.eu/nexus/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
     </repositories>
     <!--
-    <pluginRepositories>
-            <pluginRepository>
-                <id>appfuse</id>
-                <url>http://static.appfuse.org/repository</url>
-            </pluginRepository>
-            <pluginRepository>
-                <id>mc-release</id>
-                <name>Local Maven repository of releases</name>
-                <url>http://mc-repo.googlecode.com/svn/maven2/releases</url>
-                <snapshots>
-                    <enabled>false</enabled>
-                </snapshots>
-                <releases>
-                    <enabled>true</enabled>
-                </releases>
-            </pluginRepository>
-        </pluginRepositories>-->
+<pluginRepositories>
+        <pluginRepository>
+            <id>appfuse</id>
+            <url>http://static.appfuse.org/repository</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>mc-release</id>
+            <name>Local Maven repository of releases</name>
+            <url>http://mc-repo.googlecode.com/svn/maven2/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>-->
 
     <dependencies>
         <dependency>
@@ -310,4 +331,7 @@
             </build>
         </profile>
     </profiles>
+    
+    
+    
 </project>
