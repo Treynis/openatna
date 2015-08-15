@@ -5,7 +5,7 @@
     <parent>
         <groupId>eu.europa.ec.joinup.ecc.epsos-openatna</groupId>
         <artifactId>epsos-openatna</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.3</version>
     </parent>
     <artifactId>openatna-report</artifactId>
 
@@ -18,7 +18,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jasperreports-maven-plugin</artifactId>
-
+                <version>1.0-beta-2</version>
                 <executions>
                     <execution>
                         <phase>compile</phase>
